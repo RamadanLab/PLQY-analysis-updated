@@ -11,7 +11,7 @@ You will need <CODE>python >= 3.11</CODE> and <CODE>uv</CODE> which can be insta
 
 ## Usage ##
 To run the analysis code:
-<LI>First clone the repository by typing the following into your terminal: <CODE>git clone https://github.com/sophietukcer/absorption_analysis.git</CODE></LI>
+<LI>First clone the repository by typing the following into your terminal: <CODE>git clone https://github.com/RamadanLab/PLQY-analysis-updated.git</CODE></LI>
 <LI>To install the dependencies in a virtual environment, <CODE>venv</CODE>, run: <CODE>uv sync</CODE></LI>
 <LI>Finally, to run the analysis, run: <CODE>uv run main.py</CODE>. A gui will pop up to input data files.</LI>
 
