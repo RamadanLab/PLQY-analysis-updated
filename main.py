@@ -122,7 +122,7 @@ def main():
 
     logger.info("Processing sample: %s", short_name)
 
-    # File Name Derivations
+    # File naming
     if args.common:
         bckg_path = work_dir / "bckg.txt"
         empty_path = work_dir / "empty.txt"
@@ -132,27 +132,31 @@ def main():
         empty_path = work_dir / short_name.replace("in.txt", "empty.txt")
         out_path = work_dir / short_name.replace("in.txt", "out.txt")
 
-    # Load Short Exposure Arrays
+    
     raw_in = load_spectrum_file(short_in_path)
     raw_bckg = load_spectrum_file(bckg_path)
     raw_empty = load_spectrum_file(empty_path)
     raw_out = load_spectrum_file(out_path)
 
-    #raw_in = trim_spectrum(raw_in, args.cal_path or "")
     wavelengths = raw_in[:, 0]
 
-    # Baseline & Integration Time Normalization
+    # Integration time normalisation
     short_in_proc = scale_baseline_and_time(raw_in[:, 1] - raw_bckg[:, 1], args.short_time)
     short_out_proc = scale_baseline_and_time(raw_out[:, 1] - raw_bckg[:, 1], args.short_time)
     short_empty_proc = scale_baseline_and_time(raw_empty[:, 1] - raw_bckg[:, 1], args.short_time)
 
-    # Handle Optional Spliced Long Exposure
+    
     if args.long_path and Path(args.long_path).exists():
         logger.info("Splicing long integration time spectrum...")
         long_in_path = Path(args.long_path).resolve()
         long_out_path = work_dir / long_in_path.name.replace("in.txt", "out.txt")
-        long_bckg_path = work_dir / "long_bckg.txt"
-        long_empty_path = work_dir / "long_empty.txt"
+        if args.common:
+            long_bckg_path = work_dir / "long_bckg.txt"
+            long_empty_path = work_dir / "long_empty.txt"
+        else:
+            long_bckg_path = work_dir / long_in_path.name.replace("in.txt", "bckg.txt")
+            long_empty_path = work_dir / long_in_path.name.replace("in.txt", "empty.txt")
+
         
 
         raw_long_in = load_spectrum_file(long_in_path)
