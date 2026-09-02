@@ -16,5 +16,6 @@ To run the analysis code:
 <LI>Finally, to run the analysis, run: <CODE>uv run main.py</CODE>. A gui will pop up to input data files. Note that the default path to the calibration file assumes that the file is in the same folder as the code (as it will be when you clone the repo). If you wish to use a different path, or if you move the calibration file, you will need to select the file using the 'browse' widget.</LI>
 
 ## Future work ##
+<LI>This needs testing against the legacy code to ensure outputs are reliable and repeatable before release</LI>
 <LI>Add functionality to analyses multiple files from one folder.</LI>
 <LI>Add feature to enable alternative file naming for <CODE>_out</CODE> measurements, for instances where multiple spot <CODE>_in</CODE> measurements use the same <CODE>_out</CODE> measurement.</LI>
