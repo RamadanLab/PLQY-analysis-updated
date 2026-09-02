@@ -17,5 +17,8 @@ To run the analysis code:
 
 ## Future work ##
 <LI>This needs testing against the legacy code to ensure outputs are reliable and repeatable before release</LI>
+<LI><CODE>stray_light_correction</CODE> needs to be verified, the outputs seem much lower in the PL range after correction. </LI>
+<LI>Docstrings need updating</LI>
+<LI>Laser correction factor and hot pixel handling need to be verified and implimented/removed as needed.</LI>
 <LI>Add functionality to analyses multiple files from one folder.</LI>
 <LI>Add feature to enable alternative file naming for <CODE>_out</CODE> measurements, for instances where multiple spot <CODE>_in</CODE> measurements use the same <CODE>_out</CODE> measurement.</LI>
