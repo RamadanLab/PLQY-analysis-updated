@@ -37,7 +37,7 @@ def main():
     parser = GooeyParser(description="PLQY Calculator")
 
     # Required File Inputs Group
-    req = parser.add_argument_group("1. Primary Input Files", gooey_options={"columns": 1})
+    req = parser.add_argument_group("Inputs", gooey_options={"columns": 2})
     req.add_argument(
         "-sp",
         "--short_path",
@@ -54,13 +54,21 @@ def main():
         type=float,
         help="Short integration time in ms",
     )
+
     req.add_argument(
-        "-cal",
-        "--cal_path",
+        "-lp",
+        "--long_path",
         type=str,
+        default="",
         widget="FileChooser",
-        help="Path to calibration file",
-        gooey_options={"wildcard": "Text files (*.txt)|*.txt|All files (*.*)|*.*"},
+        help="Path to long exposure 'long_in.txt' file",
+    )
+    req.add_argument(
+        "-lt",
+        "--long_time",
+        default=5000,
+        type=float,
+        help="Integration time for long measurement in ms",
     )
   
     req.add_argument(
@@ -97,19 +105,12 @@ def main():
     )
 
     req.add_argument(
-        "-lp",
-        "--long_path",
+        "-cal",
+        "--cal_path",
         type=str,
-        default="",
         widget="FileChooser",
-        help="Path to long exposure 'long_in.txt' file",
-    )
-    req.add_argument(
-        "-lt",
-        "--long_time",
-        default=5000,
-        type=float,
-        help="Integration time for long measurement in ms",
+        help="Path to calibration file",
+        gooey_options={"wildcard": "Text files (*.txt)|*.txt|All files (*.*)|*.*"},
     )
 
     args = parser.parse_args()
@@ -120,7 +121,7 @@ def main():
 
     logger.info("Processing sample: %s", short_name)
 
-    # File Name Derivations
+    # File naming
     if args.common:
         bckg_path = work_dir / "bckg.txt"
         empty_path = work_dir / "empty.txt"
@@ -130,27 +131,32 @@ def main():
         empty_path = work_dir / short_name.replace("in.txt", "empty.txt")
         out_path = work_dir / short_name.replace("in.txt", "out.txt")
 
-    # Load Short Exposure Arrays
+   
     raw_in = load_spectrum_file(short_in_path)
     raw_bckg = load_spectrum_file(bckg_path)
     raw_empty = load_spectrum_file(empty_path)
     raw_out = load_spectrum_file(out_path)
 
-    #raw_in = trim_spectrum(raw_in, args.cal_path or "")
+ 
     wavelengths = raw_in[:, 0]
 
-    # Baseline & Integration Time Normalization
+    # Integration time normalise
     short_in_proc = scale_baseline_and_time(raw_in[:, 1] - raw_bckg[:, 1], args.short_time)
     short_out_proc = scale_baseline_and_time(raw_out[:, 1] - raw_bckg[:, 1], args.short_time)
     short_empty_proc = scale_baseline_and_time(raw_empty[:, 1] - raw_bckg[:, 1], args.short_time)
 
-    # Handle Optional Spliced Long Exposure
+   
     if args.long_path and Path(args.long_path).exists():
         logger.info("Splicing long integration time spectrum...")
         long_in_path = Path(args.long_path).resolve()
         long_out_path = work_dir / long_in_path.name.replace("in.txt", "out.txt")
-        long_bckg_path = work_dir / "long_bckg.txt"
-        long_empty_path = work_dir / "long_empty.txt"
+        if args.common:
+            long_bckg_path = work_dir / "long_bckg.txt"
+            long_empty_path = work_dir / "long_empty.txt"
+        else:
+            long_bckg_path = work_dir / long_in_path.name.replace("in.txt", "bckg.txt")
+            long_empty_path = work_dir / long_in_path.name.replace("in.txt", "empty.txt")
+
         
 
         raw_long_in = load_spectrum_file(long_in_path)
@@ -170,7 +176,7 @@ def main():
         counts_out = short_out_proc
         counts_empty = short_empty_proc
 
-    # Interpolate & Apply Calibration Curve
+    # Interpolate & apply calibration
     if args.cal_path:
         cal = load_and_interpolate_calibration(args.cal_path, wavelengths)
     else:
@@ -181,7 +187,7 @@ def main():
     spec_out = counts_out * cal
     spec_empty = counts_empty * cal
 
-    # Stray Light Background Correction
+    # Stray light correction
     if args.stray_light:
         spec_in, spec_out, spec_empty = remove_stray_light(
             spec_in,
@@ -192,7 +198,7 @@ def main():
             pl_range=tuple(args.pl_range),
         )
 
-    # Compute Final PLQY
+    # Compute PLQY
     result, centre, fwhm, voigt_fit, fitlabel = compute_plqy(
         wavelengths=wavelengths,
         spec_in=spec_in,
@@ -202,7 +208,7 @@ def main():
         pl_range=tuple(args.pl_range),
     )
 
-    # Print Summary to Gooey Console
+    # Print summary to Gooey Console
     print("\n" + "=" * 40)
     print(f"RESULTS ({short_name})")
     print("=" * 40)
