@@ -47,6 +47,7 @@ def main():
         help="Path to the '_short_in.txt' file (e.g. 'sample_short_in.txt')",
         gooey_options={"wildcard": "IN files (*_in.txt)|*_in.txt|All files (*.*)|*.*"},
     )
+
     req.add_argument(
         "-st",
         "--short_time",
@@ -139,11 +140,12 @@ def main():
 
  
     wavelengths = raw_in[:, 0]
+    laser_range = args.laser_range
 
     # Integration time normalise
-    short_in_proc = scale_baseline_and_time(raw_in[:, 1] - raw_bckg[:, 1], args.short_time)
-    short_out_proc = scale_baseline_and_time(raw_out[:, 1] - raw_bckg[:, 1], args.short_time)
-    short_empty_proc = scale_baseline_and_time(raw_empty[:, 1] - raw_bckg[:, 1], args.short_time)
+    short_in_proc = scale_baseline_and_time(raw_in[:, 1] - raw_bckg[:, 1], wavelengths, laser_range, args.short_time)
+    short_out_proc = scale_baseline_and_time(raw_out[:, 1] - raw_bckg[:, 1], wavelengths, laser_range, args.short_time)
+    short_empty_proc = scale_baseline_and_time(raw_empty[:, 1] - raw_bckg[:, 1], wavelengths, laser_range, args.short_time)
 
    
     if args.long_path and Path(args.long_path).exists():
@@ -164,9 +166,9 @@ def main():
         raw_long_empty = load_spectrum_file(long_empty_path)
         raw_long_out = load_spectrum_file(long_out_path)
 
-        long_in_proc = scale_baseline_and_time(raw_long_in[:, 1] - raw_long_bckg[:, 1], args.long_time)
-        long_out_proc = scale_baseline_and_time(raw_long_out[:, 1] - raw_long_bckg[:, 1], args.long_time)
-        long_empty_proc = scale_baseline_and_time(raw_long_empty[:, 1] - raw_long_bckg[:, 1], args.long_time)
+        long_in_proc = scale_baseline_and_time(raw_long_in[:, 1] - raw_long_bckg[:, 1], wavelengths, laser_range, args.long_time)
+        long_out_proc = scale_baseline_and_time(raw_long_out[:, 1] - raw_long_bckg[:, 1], wavelengths, laser_range, args.long_time)
+        long_empty_proc = scale_baseline_and_time(raw_long_empty[:, 1] - raw_long_bckg[:, 1], wavelengths, laser_range, args.long_time)
 
         counts_in = combine_short_long_spectra(short_in_proc, long_in_proc, wavelengths, tuple(args.laser_range))
         counts_out = combine_short_long_spectra(short_out_proc, long_out_proc, wavelengths, tuple(args.laser_range))
@@ -220,7 +222,7 @@ def main():
     print(f"FWHM         : {result.fwhm_nm:.2f} nm")
     print("=" * 40 + "\n")
 
-    # Save Output Plot / Text Data
+    # Save Output plot
     fig = generate_plqy_figure(
         result=result,
         laser_range=tuple(args.laser_range),
