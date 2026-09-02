@@ -193,7 +193,7 @@ def main():
         )
 
     # Compute Final PLQY
-    result, centre, fwhm, voigt_fit = compute_plqy(
+    result, centre, fwhm, voigt_fit, fitlabel = compute_plqy(
         wavelengths=wavelengths,
         spec_in=spec_in,
         spec_out=spec_out,
@@ -220,6 +220,7 @@ def main():
         laser_range=tuple(args.laser_range),
         pl_range=tuple(args.pl_range),
         voigt_fit=voigt_fit,
+        fitlabel=fitlabel,
         short_time_ms=args.short_time,
     )
 
