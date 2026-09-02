@@ -111,6 +111,7 @@ def main():
         type=str,
         widget="FileChooser",
         help="Path to calibration file",
+        default = '2024-08-02_PLQYCalibrationfile2.txt',
         gooey_options={"wildcard": "Text files (*.txt)|*.txt|All files (*.*)|*.*"},
     )
 
