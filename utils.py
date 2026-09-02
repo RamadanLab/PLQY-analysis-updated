@@ -83,7 +83,7 @@ def load_spectrum_file(file_path: Union[str, Path]) -> np.ndarray:
         raise ValueError(f"Could not parse spectral file {path.name}") from err
 
 def trim_spectrum(data: np.ndarray, config_name: str) -> np.ndarray:
-    """Trim outer noisy pixels based on spectrometer hardware profile.
+    """Trim outer noisy pixels based on spectrometer hardware. MUST BE ARCHIVED!
 
         Parameters
     ----------

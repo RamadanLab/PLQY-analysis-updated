@@ -36,8 +36,8 @@ logger = logging.getLogger("PLQY_App")
 def main():
     parser = GooeyParser(description="PLQY Calculator")
 
-    # Required File Inputs Group
-    req = parser.add_argument_group("1. Primary Input Files", gooey_options={"columns": 1})
+    
+    req = parser.add_argument_group("Inputs", gooey_options={"columns": 2})
     req.add_argument(
         "-sp",
         "--short_path",
@@ -54,15 +54,24 @@ def main():
         type=float,
         help="Short integration time in ms",
     )
-    req.add_argument(
-        "-cal",
-        "--cal_path",
-        type=str,
-        widget="FileChooser",
-        help="Path to calibration file",
-        gooey_options={"wildcard": "Text files (*.txt)|*.txt|All files (*.*)|*.*"},
-    )
   
+    req.add_argument(
+        "-lp",
+        "--long_path",
+        type=str,
+        default="",
+        widget="FileChooser",
+        help="Path to long exposure 'long_in.txt' file",
+    )
+
+    req.add_argument(
+        "-lt",
+        "--long_time",
+        default=5000,
+        type=float,
+        help="Integration time for long measurement in ms",
+    )
+
     req.add_argument(
         "-c",
         "--common",
@@ -97,19 +106,12 @@ def main():
     )
 
     req.add_argument(
-        "-lp",
-        "--long_path",
+        "-cal",
+        "--cal_path",
         type=str,
-        default="",
         widget="FileChooser",
-        help="Path to long exposure 'long_in.txt' file",
-    )
-    req.add_argument(
-        "-lt",
-        "--long_time",
-        default=5000,
-        type=float,
-        help="Integration time for long measurement in ms",
+        help="Path to calibration file",
+        gooey_options={"wildcard": "Text files (*.txt)|*.txt|All files (*.*)|*.*"},
     )
 
     args = parser.parse_args()
