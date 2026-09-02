@@ -13,7 +13,7 @@ You will need <CODE>python >= 3.11</CODE> and <CODE>uv</CODE> which can be insta
 To run the analysis code:
 <LI>First clone the repository by typing the following into your terminal: <CODE>git clone https://github.com/RamadanLab/PLQY-analysis-updated.git</CODE></LI>
 <LI>To install the dependencies in a virtual environment, <CODE>venv</CODE>, run: <CODE>uv sync</CODE></LI>
-<LI>Finally, to run the analysis, run: <CODE>uv run main.py</CODE>. A gui will pop up to input data files. Not that the default path to the calibration file assumes that the file is in the same folder as the code (as it will be when you clone the repo). If you wish to use a different path, or if you move the calibration file, you will need to select the file using the 'browse' widget.</LI>
+<LI>Finally, to run the analysis, run: <CODE>uv run main.py</CODE>. A gui will pop up to input data files. Note that the default path to the calibration file assumes that the file is in the same folder as the code (as it will be when you clone the repo). If you wish to use a different path, or if you move the calibration file, you will need to select the file using the 'browse' widget.</LI>
 
 ## Future work ##
 <LI>Add functionality to analyses multiple files from one folder.</LI>
