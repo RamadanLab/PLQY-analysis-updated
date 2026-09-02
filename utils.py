@@ -104,13 +104,17 @@ def trim_spectrum(data: np.ndarray, config_name: str) -> np.ndarray:
     return data
 
 
-def scale_baseline_and_time(intensity: np.ndarray, integration_time_ms: float) -> np.ndarray:
+def scale_baseline_and_time(intensity: np.ndarray, wavelengths: np.ndarray, laser_range: Tuple[float, float], integration_time_ms: float) -> np.ndarray:
     """Subtract baseline noise floor and normalize by integration time.
 
     Parameters
     ----------
     intensity : np.ndarray
         1D array of intensity values.
+    wavelengths : np.ndarray
+        1D array of wavelength values.
+    laser_range : Tuple[float, float]
+        range where the laser peak lies, in nm.
     integration_time_ms : float
         Integration time in milliseconds.
 
@@ -123,8 +127,9 @@ def scale_baseline_and_time(intensity: np.ndarray, integration_time_ms: float) -
         logger.warning("Integration time is <= 0 ms (%s). Setting to 1.0 to avoid division by zero.", integration_time_ms)
         integration_time_ms = 1.0
 
-    # Baseline noise estimate from indices 20 to 50
-    noise_floor = np.mean(intensity[20:50])
+    # Baseline noise estimate from below laser range
+    floor_indices = np.where(wavelengths < laser_range[0])
+    noise_floor = np.mean(intensity[floor_indices])
     return (intensity - noise_floor) / integration_time_ms
 
 
