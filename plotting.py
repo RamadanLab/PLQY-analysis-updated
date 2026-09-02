@@ -12,6 +12,7 @@ def generate_plqy_figure(
     laser_range: tuple[float, float],
     pl_range: tuple[float, float],
     voigt_fit: np.ndarray,
+    fitlabel: str,
     short_time_ms: float,
 ) -> plt.Figure:
     """Generate a 3-panel figure displaying excitation, PL spectra, and fitted peak parameters.
@@ -73,13 +74,13 @@ def generate_plqy_figure(
     net_in = result.spec_in - result.spec_empty
     net_out = result.spec_out - result.spec_empty
 
-    ax3.plot(wl, net_in, label="in - empty")
-    ax3.plot(wl, net_out, label="out - empty")
+    ax3.plot(wl, net_in, label="in")
+    ax3.plot(wl, net_out, label="out")
 
     # Plot Voigt fit if available
     fit_mask = (wl > pl_range[0]) & (wl < pl_range[1])
     if len(voigt_fit) == np.sum(fit_mask):
-        ax3.plot(wl[fit_mask], voigt_fit, "k--", alpha=0.8, label="Voigt Fit")
+        ax3.plot(wl[fit_mask], voigt_fit, "k--", alpha=0.8, label=fitlabel)
 
     ax3.set_xlabel("Wavelength [nm]")
     ax3.set_ylabel("Intensity [µW/nm]")
@@ -90,14 +91,14 @@ def generate_plqy_figure(
         max_val = np.max(net_in[pl_mask])
         ax3.set_ylim(0, 1.2 * max_val if max_val > 0 else 1.0)
 
-    ax3.legend()
+    ax3.legend(loc='upper right')
     ax3.annotate(
         f"PLQY = {result.plqy_percent:.2f} %\n"
         f"Absorptance = {result.absorptance_percent:.2f} %\n"
         f"OD = {result.optical_density:.2f}\n"
         f"Peak centre = {result.peak_centre_nm:.2f} nm\n"
         f"FWHM = {result.fwhm_nm:.2f} nm",
-        xy=(0.05, 0.78),
+        xy=(0.05, 0.8),
         xycoords="axes fraction",
     )
 

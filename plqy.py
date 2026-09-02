@@ -162,23 +162,26 @@ def fit_voigt_peak(
 
     model = VoigtModel() + ConstantModel()
     params = model.make_params(
-        amplitude=float(np.max(sp_fit)),
-        centre=float(wl_fit[np.argmax(sp_fit)]),
-        sigma=10.0,
-        gamma=10.0,
-        c=0.0,
+        amplitude= {'value' : 50*float(np.max(sp_fit)), 'vary' : True},
+        center={'value' : float(wl_fit[np.argmax(sp_fit)]), 'vary' : True},
+        sigma= {'value' : 50, 'vary' : True},
+        gamma= {'value' : 50, 'vary' : True},
+        c=0.0
     )
 
     try:
         fit_result = model.fit(sp_fit, params, x=wl_fit)
-        centre = float(fit_result.params["centre"].value)
+        centre = float(fit_result.params["center"].value)
         fwhm = float(fit_result.params["fwhm"].value)
         best_fit = fit_result.best_fit
+        label = 'voigt fit'
         logger.info("Voigt fit successful: Peak centre = %.2f nm, FWHM = %.2f nm", centre, fwhm)
-        return centre, fwhm, best_fit
+        return centre, fwhm, best_fit, label
     except Exception as err:
+        initial_fit =  fit_result.init_fit
+        label = 'initial voigt fit'
         logger.error("Voigt fitting failed: %s", err)
-        return 0.0, 0.0, sp_fit
+        return 0.0, 0.0, initial_fit, label
 
 
 def compute_plqy(
@@ -248,7 +251,7 @@ def compute_plqy(
 
     
     emission_signal = spec_in - spec_empty
-    peak_centre, fwhm, voigt_fit = fit_voigt_peak(wavelengths, emission_signal, pl_range)
+    peak_centre, fwhm, voigt_fit, fitlabel = fit_voigt_peak(wavelengths, emission_signal, pl_range)
 
     result = PLQYResult(
         plqy_percent=plqy_pct,
@@ -266,4 +269,4 @@ def compute_plqy(
         spec_proc=spec_in - spec_out,
     )
 
-    return result, peak_centre, fwhm, voigt_fit
+    return result, peak_centre, fwhm, voigt_fit, fitlabel
