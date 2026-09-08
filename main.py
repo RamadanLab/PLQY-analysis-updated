@@ -14,6 +14,7 @@ from utils import (
     load_and_interpolate_calibration,
     load_spectrum_file,
     scale_baseline_and_time,
+    trim_spectrum,
 )
 
 # Configure logging to console
@@ -22,7 +23,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     handlers=[logging.StreamHandler(sys.stdout)],
 )
-logger = logging.getLogger("PLQY_App")
+logger = logging.getLogger("PLQY")
 
 
 @Gooey(
@@ -36,7 +37,7 @@ logger = logging.getLogger("PLQY_App")
 def main():
     parser = GooeyParser(description="PLQY Calculator")
 
-    # Required File Inputs Group
+    # Required files
     req = parser.add_argument_group("Inputs", gooey_options={"columns": 2})
     req.add_argument(
         "-sp",
@@ -75,27 +76,19 @@ def main():
     req.add_argument(
         "-c",
         "--common",
-        action="store_true",
         default = True,
+        action = 'store_true',
         help="Use common background ('bckg.txt') and empty ('empty.txt') files in directory.",
     )
 
     req.add_argument(
         "-sl",
         "--stray_light",
-        action="store_true",
-        default=True,
+        default=False,
+        action = 'store_true',
         help="Removes stray light background (Recommended).",
     )
 
-    req.add_argument(
-        "-lr",
-        "--laser_range",
-        nargs=2,
-        default=[395, 415],
-        type=float,
-        help="Laser band (min max)",
-    )
     req.add_argument(
         "-plr",
         "--pl_range",
@@ -105,7 +98,28 @@ def main():
         help="PL detection band (min max)",
     )
 
-    req.add_argument(
+    configs = parser.add_argument_group("Experimental configurations", gooey_options={"columns": 2})
+
+    configs.add_argument(
+        "-trimidxs",
+        "--trim_indices",
+        nargs = 2,
+        type = int,
+        default = [4,-5],
+        help = "Indices to trim due to hot pixels. Default options should be used for the QEPro spectrometer [08/09/2026]"
+
+    )
+
+    configs.add_argument(
+        "-lr",
+        "--laser_range",
+        nargs=2,
+        default=[395, 415],
+        type=float,
+        help="Laser band (min max)",
+    )
+
+    configs.add_argument(
         "-cal",
         "--cal_path",
         type=str,
@@ -113,6 +127,15 @@ def main():
         help="Path to calibration file",
         default = '2024-08-02_PLQYCalibrationfile2.txt',
         gooey_options={"wildcard": "Text files (*.txt)|*.txt|All files (*.*)|*.*"},
+    )
+
+    configs.add_argument(
+        "-di",
+        "--dark_indices",
+        nargs=2,
+        default=[20, 50],
+        type=int,
+        help="Laser band (min max)",
     )
 
     args = parser.parse_args()
@@ -143,10 +166,11 @@ def main():
     wavelengths = raw_in[:, 0]
     laser_range = args.laser_range
 
-    # Integration time normalise
-    short_in_proc = scale_baseline_and_time(raw_in[:, 1] - raw_bckg[:, 1], wavelengths, laser_range, args.short_time)
-    short_out_proc = scale_baseline_and_time(raw_out[:, 1] - raw_bckg[:, 1], wavelengths, laser_range, args.short_time)
-    short_empty_proc = scale_baseline_and_time(raw_empty[:, 1] - raw_bckg[:, 1], wavelengths, laser_range, args.short_time)
+    # Integration time trim and normalise
+    wavelengths, raw_in_trimmed, raw_out_trimmed, raw_empty_trimmed, raw_bckg_trimmed = [trim_spectrum(data, args.trim_indices) for data in (wavelengths, raw_in[:, 1], raw_out[:, 1], raw_empty[:, 1], raw_bckg[:, 1])]
+    short_in_proc = scale_baseline_and_time(raw_in_trimmed - raw_bckg_trimmed, wavelengths, args.short_time, args.dark_indices)
+    short_out_proc = scale_baseline_and_time(raw_out_trimmed - raw_bckg_trimmed, wavelengths, args.short_time, args.dark_indices)
+    short_empty_proc = scale_baseline_and_time(raw_empty_trimmed - raw_bckg_trimmed, wavelengths, args.short_time, args.dark_indices)
 
    
     if args.long_path and Path(args.long_path).exists():
@@ -167,9 +191,11 @@ def main():
         raw_long_empty = load_spectrum_file(long_empty_path)
         raw_long_out = load_spectrum_file(long_out_path)
 
-        long_in_proc = scale_baseline_and_time(raw_long_in[:, 1] - raw_long_bckg[:, 1], wavelengths, laser_range, args.long_time)
-        long_out_proc = scale_baseline_and_time(raw_long_out[:, 1] - raw_long_bckg[:, 1], wavelengths, laser_range, args.long_time)
-        long_empty_proc = scale_baseline_and_time(raw_long_empty[:, 1] - raw_long_bckg[:, 1], wavelengths, laser_range, args.long_time)
+        raw_long_in_trimmed, raw_long_out_trimmed, raw_long_empty_trimmed, raw_long_bckg_trimmed = [trim_spectrum(data, args.trim_indices) for data in (raw_long_in[:, 1], raw_long_out[:, 1], raw_long_empty[:, 1], raw_long_bckg[:, 1])]
+
+        long_in_proc = scale_baseline_and_time(raw_long_in_trimmed - raw_long_bckg_trimmed, wavelengths, args.long_time, args.dark_indices)
+        long_out_proc = scale_baseline_and_time(raw_long_out_trimmed - raw_long_bckg_trimmed, wavelengths, args.long_time, args.dark_indices)
+        long_empty_proc = scale_baseline_and_time(raw_long_empty_trimmed - raw_long_bckg_trimmed, wavelengths, args.long_time, args.dark_indices)
 
         counts_in = combine_short_long_spectra(short_in_proc, long_in_proc, wavelengths, tuple(args.laser_range))
         counts_out = combine_short_long_spectra(short_out_proc, long_out_proc, wavelengths, tuple(args.laser_range))
@@ -233,7 +259,7 @@ def main():
         short_time_ms=args.short_time,
     )
 
-    pdf_out_path = work_dir / short_name.replace("in.txt", "fig.pdf")
+    pdf_out_path = work_dir / short_name.replace("in.txt", "fig_test.pdf")
     txt_out_path = work_dir / short_name.replace("in.txt", "spectra.txt")
 
     fig.savefig(pdf_out_path, format="pdf", bbox_inches="tight")

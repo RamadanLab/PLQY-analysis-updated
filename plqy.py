@@ -5,7 +5,7 @@ import numpy as np
 from scipy.constants import Planck, speed_of_light
 from lmfit.models import ConstantModel, VoigtModel
 
-from utils import integrate_range
+from utils import integrate_range, trim_spectrum
 
 logger = logging.getLogger(__name__)
 
@@ -121,7 +121,7 @@ def calculate_laser_power(
         correction_factor = 20.0  # 405 nm / 660 nm setup
 
     power_uw = raw_power_uw * correction_factor
-    error_uw = power_uw * 0.05
+    error_uw = round(power_uw * 0.05, 1)
 
     if power_uw > 100.0:
         val_mw = power_uw / 1000.0
@@ -178,10 +178,10 @@ def fit_voigt_peak(
         logger.info("Voigt fit successful: Peak centre = %.2f nm, FWHM = %.2f nm", centre, fwhm)
         return centre, fwhm, best_fit, label
     except Exception as err:
-        initial_fit =  fit_result.init_fit
-        label = 'initial voigt fit'
+        zero_array =  np.zeros(len(sp_fit))
+        label = 'fitting failed'
         logger.error("Voigt fitting failed: %s", err)
-        return 0.0, 0.0, initial_fit, label
+        return 0.0, 0.0, zero_array, label
 
 
 def compute_plqy(
