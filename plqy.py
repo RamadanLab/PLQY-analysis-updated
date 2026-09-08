@@ -114,7 +114,7 @@ def calculate_laser_power(
     """
     raw_power_uw = integrate_range(spec_empty, wavelengths, laser_range)
 
-    # Determine calibration factor based on laser wavelength band - this needs to be double checked and updated, clearly we don't have a 532 nm or 660 nm laser #
+    # Determine correction factor based on laser wavelength band - this needs to be double checked and updated, clearly we don't have a 532 nm or 660 nm laser #
     if 500.0 <= laser_range[0] <= 530.0:
         correction_factor = 1.17  # 532 nm setup
     else:
