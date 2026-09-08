@@ -5,7 +5,7 @@ import numpy as np
 from scipy.constants import Planck, speed_of_light
 from lmfit.models import ConstantModel, VoigtModel
 
-from utils import integrate_range
+from utils import integrate_range, trim_spectrum
 
 logger = logging.getLogger(__name__)
 
