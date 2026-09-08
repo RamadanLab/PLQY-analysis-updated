@@ -17,9 +17,9 @@ To run the analysis code:
 
 ## Needs updating (must do) ##
 <LI>This needs testing against the legacy code to ensure outputs are reliable and repeatable before release</LI>
-<LI><CODE>stray_light_correction</CODE> needs to be verified, the outputs seem much lower in the PL range after correction. </LI>
+<LI><S><CODE>stray_light_correction</CODE> needs to be verified, the outputs seem much lower in the PL range after correction.</S> </LI>
 <LI>Docstrings need updating</LI>
-<LI>Laser correction factor and hot pixel handling need to be verified and implimented/removed as needed.</LI>
+<LI>Laser correction factor and <S>hot pixel handling</S> need to be verified and implimented/removed as needed.</LI>
 
 ## Future work (nice-to-have) ##
 <LI>Add functionality to analyses multiple files from one folder.</LI>
