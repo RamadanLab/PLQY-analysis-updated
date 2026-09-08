@@ -76,16 +76,16 @@ def main():
     req.add_argument(
         "-c",
         "--common",
-        action="store_true",
         default = True,
+        action = 'store_true',
         help="Use common background ('bckg.txt') and empty ('empty.txt') files in directory.",
     )
 
     req.add_argument(
         "-sl",
         "--stray_light",
-        action="store_true",
-        default=True,
+        default=False,
+        action = 'store_true',
         help="Removes stray light background (Recommended).",
     )
 
@@ -129,6 +129,15 @@ def main():
         gooey_options={"wildcard": "Text files (*.txt)|*.txt|All files (*.*)|*.*"},
     )
 
+    configs.add_argument(
+        "-di",
+        "--dark_indices",
+        nargs=2,
+        default=[20, 50],
+        type=int,
+        help="Laser band (min max)",
+    )
+
     args = parser.parse_args()
 
     short_in_path = Path(args.short_path).resolve()
@@ -159,9 +168,9 @@ def main():
 
     # Integration time trim and normalise
     wavelengths, raw_in_trimmed, raw_out_trimmed, raw_empty_trimmed, raw_bckg_trimmed = [trim_spectrum(data, args.trim_indices) for data in (wavelengths, raw_in[:, 1], raw_out[:, 1], raw_empty[:, 1], raw_bckg[:, 1])]
-    short_in_proc = scale_baseline_and_time(raw_in_trimmed - raw_bckg_trimmed, wavelengths, laser_range, args.short_time)
-    short_out_proc = scale_baseline_and_time(raw_out_trimmed - raw_bckg_trimmed, wavelengths, laser_range, args.short_time)
-    short_empty_proc = scale_baseline_and_time(raw_empty_trimmed - raw_bckg_trimmed, wavelengths, laser_range, args.short_time)
+    short_in_proc = scale_baseline_and_time(raw_in_trimmed - raw_bckg_trimmed, wavelengths, args.short_time, args.dark_indices)
+    short_out_proc = scale_baseline_and_time(raw_out_trimmed - raw_bckg_trimmed, wavelengths, args.short_time, args.dark_indices)
+    short_empty_proc = scale_baseline_and_time(raw_empty_trimmed - raw_bckg_trimmed, wavelengths, args.short_time, args.dark_indices)
 
    
     if args.long_path and Path(args.long_path).exists():
@@ -184,9 +193,9 @@ def main():
 
         raw_long_in_trimmed, raw_long_out_trimmed, raw_long_empty_trimmed, raw_long_bckg_trimmed = [trim_spectrum(data, args.trim_indices) for data in (raw_long_in[:, 1], raw_long_out[:, 1], raw_long_empty[:, 1], raw_long_bckg[:, 1])]
 
-        long_in_proc = scale_baseline_and_time(raw_long_in_trimmed - raw_long_bckg_trimmed, wavelengths, laser_range, args.long_time)
-        long_out_proc = scale_baseline_and_time(raw_long_out_trimmed - raw_long_bckg_trimmed, wavelengths, laser_range, args.long_time)
-        long_empty_proc = scale_baseline_and_time(raw_long_empty_trimmed - raw_long_bckg_trimmed, wavelengths, laser_range, args.long_time)
+        long_in_proc = scale_baseline_and_time(raw_long_in_trimmed - raw_long_bckg_trimmed, wavelengths, args.long_time, args.dark_indices)
+        long_out_proc = scale_baseline_and_time(raw_long_out_trimmed - raw_long_bckg_trimmed, wavelengths, args.long_time, args.dark_indices)
+        long_empty_proc = scale_baseline_and_time(raw_long_empty_trimmed - raw_long_bckg_trimmed, wavelengths, args.long_time, args.dark_indices)
 
         counts_in = combine_short_long_spectra(short_in_proc, long_in_proc, wavelengths, tuple(args.laser_range))
         counts_out = combine_short_long_spectra(short_out_proc, long_out_proc, wavelengths, tuple(args.laser_range))
@@ -250,7 +259,7 @@ def main():
         short_time_ms=args.short_time,
     )
 
-    pdf_out_path = work_dir / short_name.replace("in.txt", "fig.pdf")
+    pdf_out_path = work_dir / short_name.replace("in.txt", "fig_test.pdf")
     txt_out_path = work_dir / short_name.replace("in.txt", "spectra.txt")
 
     fig.savefig(pdf_out_path, format="pdf", bbox_inches="tight")

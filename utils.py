@@ -82,29 +82,42 @@ def load_spectrum_file(file_path: Union[str, Path]) -> np.ndarray:
         logger.error("Failed to parse file %s: %s", path.name, err)
         raise ValueError(f"Could not parse spectral file {path.name}") from err
 
-def trim_spectrum(data: np.ndarray, config_name: str) -> np.ndarray:
-    """Trim outer noisy pixels based on spectrometer hardware profile THIS FUNCTION IS OT CURRENTLY CALLED !
+def trim_spectrum(data: np.ndarray, trim_indices : Tuple[int,int]) -> np.ndarray:
+    """Trims outer noisy pixels. This is non-inclusive, i.e, for startindex = 4 the first 4 rows are trimmed, for endindex = -5 the last 5 rows are trimmed.
 
         Parameters
     ----------
     data : np.ndarray
         2D array of spectral data.
-    config_name : str
-        Spectrometer configuration name or identifier.
+    trim_indices : Tuple[int, int]
+        Indices to trim data in the form [startidx, endidx]. 'normal' data is between these indices.
 
     Returns
     -------
     np.ndarray
         Trimmed array.
     """
-    if "QE" in config_name:
-        return data[4:-5, :]
-    elif "Maya" in config_name:
-        return data[5:-6, :]
-    return data
+    startidx = trim_indices[0]
+    endidx = trim_indices[1]
+
+    total_rows = len(data)
+
+    norm_start = startidx + total_rows if startidx < 0 else startidx
+    norm_end = endidx + total_rows if endidx < 0 else endidx
+
+    if norm_start > norm_end:
+        logger.critical(f"Critical Slicing Error: startidx ({startidx}) is greater than endidx ({endidx}).")
+        raise ValueError(f"Critical Slicing Error: startidx ({startidx}) is greater than endidx ({endidx}).")
+
+    trimmed_data = data[startidx : endidx]
+    rows_removed = total_rows - len(trimmed_data)
+    if rows_removed > 30:
+        logger.warning(f"Excessive data loss: Trimmed {rows_removed} rows (threshold is 30).")
+ 
+    return trimmed_data
 
 
-def scale_baseline_and_time(intensity: np.ndarray, wavelengths: np.ndarray, laser_range: Tuple[float, float], integration_time_ms: float) -> np.ndarray:
+def scale_baseline_and_time(intensity: np.ndarray, wavelengths: np.ndarray, integration_time_ms: float, dark_indices: Tuple[int,int]) -> np.ndarray:
     """Subtract baseline noise floor and normalize by integration time.
 
     Parameters
@@ -117,6 +130,8 @@ def scale_baseline_and_time(intensity: np.ndarray, wavelengths: np.ndarray, lase
         range where the laser peak lies, in nm.
     integration_time_ms : float
         Integration time in milliseconds.
+    dark_indices : Tuple[int, int]
+        Indices of 'dark' pixels, used to subtract a noise floor.
 
     Returns
     -------
@@ -128,8 +143,7 @@ def scale_baseline_and_time(intensity: np.ndarray, wavelengths: np.ndarray, lase
         integration_time_ms = 1.0
 
     # Baseline noise estimate from below laser range
-    floor_indices = np.where(wavelengths < laser_range[0])
-    noise_floor = np.mean(intensity[floor_indices])
+    noise_floor = np.mean(intensity[dark_indices[0] : dark_indices[1]])
     return (intensity - noise_floor) / integration_time_ms
 
 
