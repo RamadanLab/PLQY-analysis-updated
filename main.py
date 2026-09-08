@@ -101,16 +101,6 @@ def main():
     configs = parser.add_argument_group("Experimental configurations", gooey_options={"columns": 2})
 
     configs.add_argument(
-        "-trimidxs",
-        "--trim_indices",
-        nargs = 2,
-        type = int,
-        default = [4,-5],
-        help = "Indices to trim due to hot pixels. Default options should be used for the QEPro spectrometer [08/09/2026]"
-
-    )
-
-    configs.add_argument(
         "-lr",
         "--laser_range",
         nargs=2,
@@ -136,6 +126,16 @@ def main():
         default=[20, 50],
         type=int,
         help="Laser band (min max)",
+    )
+
+    configs.add_argument(
+        "-trimidxs",
+        "--trim_indices",
+        nargs = 2,
+        type = int,
+        default = [4,-5],
+        help = "Indices to trim due to hot pixels. Default options should be used for the QEPro spectrometer [08/09/2026]"
+
     )
 
     args = parser.parse_args()
