@@ -95,8 +95,9 @@ def calculate_laser_power(
     spec_empty: np.ndarray,
     wavelengths: np.ndarray,
     laser_range: Tuple[float, float],
+    correction_factor: float,
 ) -> Tuple[float, str, float]:
-    """ HUGE PROBLEMS HERE!!!!!!!!!!!!!!!!!!! Estimate excitation laser power and power error based on empty sphere counts.
+    """ Estimate excitation laser power and power error based on empty sphere counts and correction factor (measured) to account for coupling between fibre-optic cable and spectrometer.
 
     Parameters
     ----------
@@ -106,6 +107,8 @@ def calculate_laser_power(
         Wavelength array in nm.
     laser_range : Tuple[float, float]
         (min_wl, max_wl) bounds of the excitation line.
+    correction_factor : float
+        fibre - spectrometer correction factor
 
     Returns
     -------
@@ -114,14 +117,8 @@ def calculate_laser_power(
     """
     raw_power_uw = integrate_range(spec_empty, wavelengths, laser_range)
 
-    # Determine correction factor based on laser wavelength band - this needs to be double checked and updated, clearly we don't have a 532 nm or 660 nm laser #
-    if 500.0 <= laser_range[0] <= 530.0:
-        correction_factor = 1.17  # 532 nm setup
-    else:
-        correction_factor = 20.0  # 405 nm / 660 nm setup
-
     power_uw = raw_power_uw * correction_factor
-    error_uw = round(power_uw * 0.05, 1)
+    error_uw = round(power_uw * 0.05)
 
     if power_uw > 100.0:
         val_mw = power_uw / 1000.0
@@ -191,6 +188,7 @@ def compute_plqy(
     spec_empty: np.ndarray,
     laser_range: Tuple[float, float],
     pl_range: Tuple[float, float],
+    correction_factor: float,
 ) -> Tuple[PLQYResult, float, float, np.ndarray]:
     """
 
@@ -208,6 +206,8 @@ def compute_plqy(
         (min_wl, max_wl) of excitation band.
     pl_range : Tuple[float, float]
         (min_wl, max_wl) of PL emission.
+    correction_factor : float
+        optical fibre - spectrometer coupling factor
     
 
     Returns
@@ -247,7 +247,7 @@ def compute_plqy(
     optical_density = -np.log10(1.0 - absorptance) if absorptance < 1.0 else np.nan
 
     
-    power_val, power_unit, power_err = calculate_laser_power(spec_empty, wavelengths, laser_range)
+    power_val, power_unit, power_err = calculate_laser_power(spec_empty, wavelengths, laser_range, correction_factor)
 
     
     emission_signal = spec_in - spec_empty
