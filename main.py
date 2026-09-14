@@ -21,9 +21,10 @@ from utils import (
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-    handlers=[logging.StreamHandler(sys.stdout)],
+    handlers=[logging.StreamHandler(sys.__stdout__)],
+    force = True,
 )
-logger = logging.getLogger("PLQY")
+logger = logging.getLogger("PLQY Calculator")
 
 
 @Gooey(
@@ -138,6 +139,15 @@ def main():
 
     )
 
+    configs.add_argument(
+        "-cor",
+        "--correction_factor",
+        type = float,
+        default = 20,
+        help = "Optical fibre - spectrometer coupling factor. Last measured: xx/xx/xxx"
+
+    )
+
     args = parser.parse_args()
 
     short_in_path = Path(args.short_path).resolve()
@@ -164,7 +174,6 @@ def main():
 
  
     wavelengths = raw_in[:, 0]
-    laser_range = args.laser_range
 
     # Integration time trim and normalise
     wavelengths, raw_in_trimmed, raw_out_trimmed, raw_empty_trimmed, raw_bckg_trimmed = [trim_spectrum(data, args.trim_indices) for data in (wavelengths, raw_in[:, 1], raw_out[:, 1], raw_empty[:, 1], raw_bckg[:, 1])]
@@ -235,6 +244,7 @@ def main():
         spec_empty=spec_empty,
         laser_range=tuple(args.laser_range),
         pl_range=tuple(args.pl_range),
+        correction_factor = args.correction_factor,
     )
 
     # Print summary to Gooey Console
