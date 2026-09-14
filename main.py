@@ -2,6 +2,7 @@
 
 import logging
 from pathlib import Path
+import re
 import sys
 from gooey import Gooey, GooeyParser
 import matplotlib.pyplot as plt
@@ -77,7 +78,7 @@ def main():
     req.add_argument(
         "-c",
         "--common",
-        default = True,
+        default = False,
         action = 'store_true',
         help="Use common background ('bckg.txt') and empty ('empty.txt') files in directory.",
     )
@@ -156,15 +157,21 @@ def main():
 
     logger.info("Processing sample: %s", short_name)
 
+    
+    out_path = work_dir / short_name.replace("in.txt", "out.txt")
+    if not out_path.exists():
+        logger.warning('Could not find exact match for out measurement')
+        out_path = work_dir / re.sub(r"_spot\d+", "", short_name).replace("in.txt", "out.txt")
+        logger.warning("Using generic out measurement: %s", out_path)
+
     # File naming
     if args.common:
         bckg_path = work_dir / "bckg.txt"
         empty_path = work_dir / "empty.txt"
-        out_path = work_dir / short_name.replace("in.txt", "out.txt")
+
     else:
         bckg_path = work_dir / short_name.replace("in.txt", "bckg.txt")
         empty_path = work_dir / short_name.replace("in.txt", "empty.txt")
-        out_path = work_dir / short_name.replace("in.txt", "out.txt")
 
    
     raw_in = load_spectrum_file(short_in_path)
@@ -185,7 +192,14 @@ def main():
     if args.long_path and Path(args.long_path).exists():
         logger.info("Splicing long integration time spectrum...")
         long_in_path = Path(args.long_path).resolve()
+
         long_out_path = work_dir / long_in_path.name.replace("in.txt", "out.txt")
+
+        if not long_out_path.exists():
+            logger.warning('Could not find exact match for long_out measurement')
+            long_out_path = work_dir / re.sub(r"_spot\d+", "", long_in_path.name).replace("in.txt", "out.txt")
+            logger.warning("Using generic long_out measurement: %s", long_out_path)
+
         if args.common:
             long_bckg_path = work_dir / "long_bckg.txt"
             long_empty_path = work_dir / "long_empty.txt"
