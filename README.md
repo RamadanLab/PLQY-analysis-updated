@@ -16,10 +16,11 @@ To run the analysis code:
 <LI>Finally, to run the analysis, run: <CODE>uv run main.py</CODE>. A gui will pop up to input data files. Note that the default path to the calibration file assumes that the file is in the same folder as the code (as it will be when you clone the repo). If you wish to use a different path, or if you move the calibration file, you will need to select the file using the 'browse' widget.</LI>
 
 ## Needs updating (must do) ##
-<LI>This needs testing against the legacy code to ensure outputs are reliable and repeatable before release</LI>
+<LI><S>This needs testing against the legacy code to ensure outputs are reliable and repeatable before release</S></LI>
 <LI><S><CODE>stray_light_correction</CODE> needs to be verified, the outputs seem much lower in the PL range after correction.</S> </LI>
 <LI>Docstrings need updating</LI>
 <LI>Laser correction factor and <S>hot pixel handling</S> need to be verified and implimented/removed as needed.</LI>
+<LI>Stray light correction and common naming toggles are currently non-functional</LI>
 
 ## Future work (nice-to-have) ##
 <LI>Add functionality to analyses multiple files from one folder.</LI>
