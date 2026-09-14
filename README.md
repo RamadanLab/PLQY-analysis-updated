@@ -5,6 +5,7 @@ Updated PLQY analysis code to extract PLQY, OD, and FWHM values from data collec
 The input file must be in the format .txt. <BR>
 The file must contain WAVELENGTH and INTENSITY columns. Any other columns are ignored. <BR>
 The <CODE>utils</CODE> module contains a function <CODE>find_data_start_row</CODE> that will determine the start row of the numerical data, allowing headers of variable length to be parsed. <BR>
+If you have taken multiple spot measurements and want to use the same <CODE>_out</CODE> and <CODE>_long_out</CODE> measurements, the <CODE>_in</CODE> measurements should be saved in the form <CODE>sample_spot1_in</CODE> etc.
 
 ## Pre-requisites ##
 You will need <CODE>python >= 3.11</CODE> and <CODE>uv</CODE> which can be installed at: https://docs.astral.sh/uv/getting-started/installation/
@@ -24,4 +25,4 @@ To run the analysis code:
 
 ## Future work (nice-to-have) ##
 <LI>Add functionality to analyses multiple files from one folder.</LI>
-<LI>Add feature to enable alternative file naming for <CODE>_out</CODE> measurements, for instances where multiple spot <CODE>_in</CODE> measurements use the same <CODE>_out</CODE> measurement.</LI>
+<LI><S>Add feature to enable alternative file naming for <CODE>_out</CODE> measurements, for instances where multiple spot <CODE>_in</CODE> measurements use the same <CODE>_out</CODE> measurement.</S></LI>
