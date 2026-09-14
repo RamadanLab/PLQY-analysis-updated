@@ -93,11 +93,11 @@ def generate_plqy_figure(
 
     ax3.legend(loc='upper right')
     ax3.annotate(
-        f"PLQY = {result.plqy_percent:.2f} %\n"
-        f"Absorptance = {result.absorptance_percent:.2f} %\n"
+        f"PLQY = {result.plqy_percent:.1f} %\n"
+        f"Absorptance = {result.absorptance_percent:.1f} %\n"
         f"OD = {result.optical_density:.2f}\n"
-        f"Peak centre = {result.peak_centre_nm:.2f} nm\n"
-        f"FWHM = {result.fwhm_nm:.2f} nm",
+        f"Peak centre = {result.peak_centre_nm:.0f} nm\n"
+        f"FWHM = {result.fwhm_nm:.0f} nm",
         xy=(0.05, 0.8),
         xycoords="axes fraction",
     )
