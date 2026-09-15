@@ -1,5 +1,5 @@
 ## Overview ##
-Updated PLQY analysis code to extract PLQY, OD, and FWHM values from data collected in C31. Data files and metadata (integration times) are inputted via a gui.
+Updated PLQY analysis code to extract PLQY, OD, and FWHM values from data collected in C31. Data files and metadata (integration times) are inputted via a gui. Following DE Mello method (REF)
 
 ## Inputs ##
 The input file must be in the format .txt. <BR>
@@ -15,6 +15,15 @@ To run the analysis code:
 <LI>First clone the repository by typing the following into your terminal: <CODE>git clone https://github.com/RamadanLab/PLQY-analysis-updated.git</CODE></LI>
 <LI>To install the dependencies in a virtual environment, <CODE>venv</CODE>, run: <CODE>uv sync</CODE></LI>
 <LI>Finally, to run the analysis, run: <CODE>uv run main.py</CODE>. A gui will pop up to input data files. Note that the default path to the calibration file assumes that the file is in the same folder as the code (as it will be when you clone the repo). If you wish to use a different path, or if you move the calibration file, you will need to select the file using the 'browse' widget.</LI>
+
+### Arguments: ###
+<LI><B>short_path:</B> Path to your <CODE>short_in</CODE> sample measurement. Use the file chooser widget to select.</LI>
+<LI><B>short_time:</B></LI>
+<LI><B>long_path:</B></LI>
+<LI><B>long_time:</B></LI>
+<LI><B>common:</B></LI>
+<LI><B>stray_light:</B></LI>
+<LI><B>pl_range:</B></LI>
 
 ## Needs updating (must do) ##
 <LI><S>This needs testing against the legacy code to ensure outputs are reliable and repeatable before release</S></LI>
