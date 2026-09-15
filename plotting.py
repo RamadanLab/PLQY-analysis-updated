@@ -58,12 +58,12 @@ def generate_plqy_figure(
     ax1.set_ylim(bottom=1e-4)
     ax1.axvline(laser_range[0], linestyle="--", color="k")
     ax1.axvline(laser_range[1], linestyle="--", color="k")
-    ax1.annotate(
-        f"Laser power: {result.laser_power_val:.2f} ± {result.laser_power_error:.2f} {result.laser_power_unit}\n"
-        f"Int. Time: {short_time_ms:.0f} ms",
-        xy=(0.05, 0.82),
-        xycoords="axes fraction",
-    )
+    # ax1.annotate(
+    #     f"Laser power: {result.laser_power_val:.2f} ± {result.laser_power_error:.2f} {result.laser_power_unit}\n"
+    #     f"Int. Time: {short_time_ms:.0f} ms",
+    #     xy=(0.05, 0.82),
+    #     xycoords="axes fraction",
+    # )
 
     # Configure PL Region Panel (ax2)
     ax2.set_xlim(pl_range[0] - 25, pl_range[1] + 25)
