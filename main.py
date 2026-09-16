@@ -268,7 +268,7 @@ def main():
     print(f"PLQY         : {result.plqy_percent:.2f} %")
     print(f"Absorptance  : {result.absorptance_percent:.2f} %")
     print(f"Optical Dens.: {result.optical_density:.2f}")
-    print(f"Laser Power  : {result.laser_power_val:.2f} ± {result.laser_power_error:.2f} {result.laser_power_unit}")
+    #print(f"Laser Power  : {result.laser_power_val:.2f} ± {result.laser_power_error:.2f} {result.laser_power_unit}")
     print(f"Peak centre  : {result.peak_centre_nm:.2f} nm")
     print(f"FWHM         : {result.fwhm_nm:.2f} nm")
     print("=" * 40 + "\n")
