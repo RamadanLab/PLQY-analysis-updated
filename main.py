@@ -48,7 +48,7 @@ def main():
         type=str,
         widget="FileChooser",
         help="Path to the '_short_in.txt' file (e.g. 'sample_short_in.txt')",
-        gooey_options={"wildcard": "IN files (*_in.txt)|*_in.txt|All files (*.*)|*.*"},
+        gooey_options={"wildcard": "IN files (*short_in.txt)|*_in.txt|All files (*.*)|*.*"},
     )
 
     req.add_argument(
@@ -66,6 +66,7 @@ def main():
         default="",
         widget="FileChooser",
         help="Path to long exposure 'long_in.txt' file",
+         gooey_options={"wildcard": "IN files (*long_in.txt)|*_in.txt|All files (*.*)|*.*"},
     )
     req.add_argument(
         "-lt",
@@ -283,7 +284,7 @@ def main():
         short_time_ms=args.short_time,
     )
 
-    pdf_out_path = work_dir / short_name.replace("in.txt", "fig_test.pdf")
+    pdf_out_path = work_dir / short_name.replace("in.txt", "fig.pdf")
     txt_out_path = work_dir / short_name.replace("in.txt", "spectra.txt")
 
     fig.savefig(pdf_out_path, format="pdf", bbox_inches="tight")
