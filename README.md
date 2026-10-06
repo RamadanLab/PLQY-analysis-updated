@@ -70,7 +70,7 @@ These should only be changed if the experimental setup is changed.
 <LI><S>Stray light correction and common naming toggles are currently non-functional.</S></LI>
 
 ## Future work (nice-to-have) ##
-<LI>Add functionality to analyses multiple files from one folder.</LI>
+<LI><S>Add functionality to analyses multiple files from one folder.</S></LI>
 <LI><S>Add feature to enable alternative file naming for <CODE>_out</CODE> measurements, for instances where multiple spot <CODE>_in</CODE> measurements use the same <CODE>_out</CODE> measurement.</S></LI>
 
 
