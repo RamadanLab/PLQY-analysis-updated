@@ -12,9 +12,24 @@ You will need <CODE>python >= 3.11</CODE> and <CODE>uv</CODE> which can be insta
 
 ## Usage ##
 To run the analysis code:
-<LI>First clone the repository by typing the following into your terminal: <CODE>git clone https://github.com/RamadanLab/PLQY-analysis-updated.git</CODE></LI>
-<LI>To install the dependencies in a virtual environment, <CODE>venv</CODE>, run: <CODE>uv sync</CODE></LI>
-<LI>Finally, to run the analysis, run: <CODE>uv run main.py</CODE>. A gui will pop up to input data files. Note that the default path to the calibration file assumes that the file is in the same folder as the code (as it will be when you clone the repo). If you wish to use a different path, or if you move the calibration file, you will need to select the file using the 'browse' widget.</LI>
+<LI>First clone the repository by typing the following into your terminal: 
+
+  ```
+   git clone https://github.com/RamadanLab/PLQY-analysis-updated.git
+ ```
+  </LI>
+<LI>To install the dependencies in a virtual environment, <CODE>venv</CODE>, run:
+  
+  ```
+  uv sync
+```
+</LI>
+<LI>Finally, to run the analysis, run: 
+  
+  ```
+  uv run main.py
+  ```
+  A gui will pop up to input data files. Note that the default path to the calibration file assumes that the file is in the same folder as the code (as it will be when you clone the repo). If you wish to use a different path, or if you move the calibration file, you will need to select the file using the 'browse' widget.</LI>
 
 ### Input Arguments: ###
 <LI><B>short_path:</B> Path to your <CODE>short_in</CODE> sample measurement. Use the file chooser widget to select.</LI>
