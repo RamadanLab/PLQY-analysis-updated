@@ -11,7 +11,7 @@ If you have taken multiple spot measurements and want to use the same <CODE>_out
 You will need <CODE>python >= 3.11</CODE> and <CODE>uv</CODE> which can be installed at: https://docs.astral.sh/uv/getting-started/installation/
 
 ## Usage ##
-To run the analysis code:
+
 <LI>First clone the repository by typing the following into your terminal: 
 
   ```
@@ -24,21 +24,35 @@ To run the analysis code:
   uv sync
 ```
 </LI>
-<LI>Finally, to run the analysis, run: 
+
+### To analyse a single sample:
+
+Run the following:
   
   ```
   uv run main.py
   ```
-  A gui will pop up to input data files. Note that the default path to the calibration file assumes that the file is in the same folder as the code (as it will be when you clone the repo). If you wish to use a different path, or if you move the calibration file, you will need to select the file using the 'browse' widget.</LI>
+  A gui will pop up to input data files. Note that the default path to the calibration file assumes that the file is in the same folder as the code (as it will be when you clone the repo). If you wish to use a different path, or if you move the calibration file, you will need to select the file using the 'browse' widget.
+
+  ### To analyse every sample withing a folder:
+  There is an option to analyse multiple files together in one go. This has most of the same arguments as before, but no gui is used. Note that currently to do this you can only set the arguments once, so all the samples will have the same integration times etc. All of the default argument values are the same, except for <CODE>common</CODE> and <CODE>stray_light</CODE>, which default to <CODE>TRUE</CODE>. Instead of having file paths as an argument, you will pass a <CODE>--directory</CODE> argument, which is the path to the folder containing all of your files. Any <CODE>short_in</CODE> files will be found and analysed. The PLQY values will be saved in a <CODE>batch_plqy_results.csv</CODE> file.
+
+  To run the code use (inputting your own arguments as required):
+  
+  ```
+  uv run batch.py --directory path\to\your\folder --short_time 100 --long_time 5000
+  ```
+
+Change any of the arguments in a similar way, e.g: <CODE>--pl_range 500 650</CODE>
 
 ### Input Arguments: ###
 <LI><B>short_path:</B> Path to your <CODE>short_in</CODE> sample measurement. Use the file chooser widget to select.</LI>
-<LI><B>short_time:</B> The short integration time of your measurement in ms.</LI>
+<LI><B>short_time:</B> The short integration time of your measurement in ms. [Defaults to 100 ms] </LI>
 <LI><B>long_path:</B> Path to your <CODE>long_in</CODE> sample measurement. Use the file chooser widget to select.</LI>
-<LI><B>long_time:</B> The long integration time of your measurement in ms.</LI>
-<LI><B>common:</B> Select this if you background and empty files are saved as <CODE>bckg</CODE>, <CODE>long_bckg</CODE>, <CODE>empty</CODE>, and <CODE>long_empty</CODE>. If this is not selected, the files should be named with the same name as the <CODE>_in</CODE> measurements, replacing <CODE>_in</CODE> with <CODE>_bckg</CODE> etc.</LI>
-<LI><B>stray_light:</B> When this is ticked a stray light correction is applied across <CODE>pl_range</CODE>, removing the effects of stray light in the integrating sphere. This is recommended to be on for all analysis.</LI>
-<LI><B>pl_range:</B> This is the expected range that your PL peak resides in, used for the peak fitting and axis limits for the plot.</LI>
+<LI><B>long_time:</B> The long integration time of your measurement in ms. [Defaults to 5000 ms] </LI>
+<LI><B>common:</B> Select this if you background and empty files are saved as <CODE>bckg</CODE>, <CODE>long_bckg</CODE>, <CODE>empty</CODE>, and <CODE>long_empty</CODE>. If this is not selected, the files should be named with the same name as the <CODE>_in</CODE> measurements, replacing <CODE>_in</CODE> with <CODE>_bckg</CODE> etc. [Defaults to <CODE>FALSE</CODE>] </LI>
+<LI><B>stray_light:</B> When this is ticked a stray light correction is applied across <CODE>pl_range</CODE>, removing the effects of stray light in the integrating sphere. This is recommended to be on for all analysis. [Defaults to <CODE>FALSE</CODE>] </LI>
+<LI><B>pl_range:</B> This is the expected range that your PL peak resides in, used for the peak fitting and axis limits for the plot. [Defaults to 560 - 850 nm] </LI>
 
 ### Experimental Configuration Arguments: ###
 These should only be changed if the experimental setup is changed.
@@ -56,7 +70,7 @@ These should only be changed if the experimental setup is changed.
 <LI><S>Stray light correction and common naming toggles are currently non-functional.</S></LI>
 
 ## Future work (nice-to-have) ##
-<LI>Add functionality to analyses multiple files from one folder.</LI>
+<LI><S>Add functionality to analyses multiple files from one folder.</S></LI>
 <LI><S>Add feature to enable alternative file naming for <CODE>_out</CODE> measurements, for instances where multiple spot <CODE>_in</CODE> measurements use the same <CODE>_out</CODE> measurement.</S></LI>
 
 
