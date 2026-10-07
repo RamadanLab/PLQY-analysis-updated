@@ -43,7 +43,7 @@ Run the following:
   uv run batch.py --directory path\to\your\folder --short_time 100 --long_time 5000
   ```
 
-Change any of the arguments in a similar way, e.g: <CODE>--pl_range 500 650</CODE>
+Change any of the arguments in a similar way, e.g: <CODE>--pl_range 500 650</CODE>. Note that if there is a space in you folder path (e.g. <CODE>G:\My Drive\</CODE> you will need to enclose the path in quote marks. 
 
 ### Input Arguments: ###
 <LI><B>short_path:</B> Path to your <CODE>short_in</CODE> sample measurement. Use the file chooser widget to select.</LI>
