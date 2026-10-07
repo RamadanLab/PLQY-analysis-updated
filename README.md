@@ -35,9 +35,26 @@ Run the following:
   A gui will pop up to input data files. Note that the default path to the calibration file assumes that the file is in the same folder as the code (as it will be when you clone the repo). If you wish to use a different path, or if you move the calibration file, you will need to select the file using the 'browse' widget.
 
   ### To analyse every sample withing a folder:
-  There is an option to analyse multiple files together in one go. This has most of the same arguments as before, but no gui is used. Note that currently to do this you can only set the arguments once, so all the samples will have the same integration times etc. All of the default argument values are the same, except for <CODE>common</CODE> and <CODE>stray_light</CODE>, which default to <CODE>TRUE</CODE>. Instead of having file paths as an argument, you will pass a <CODE>--directory</CODE> argument, which is the path to the folder containing all of your files. Any <CODE>short_in</CODE> files will be found and analysed. The PLQY values will be saved in a <CODE>batch_plqy_results.csv</CODE> file.
+  There is an option to analyse multiple files together in one go. This has most of the same arguments as before, but no gui is used. Note that currently to do this you can only set the arguments once, so all the samples will have the same integration times etc. All of the default argument values are the same, except for <CODE>common</CODE> and <CODE>stray_light</CODE>, which default to <CODE>TRUE</CODE>. Instead of having file paths as an argument, you will pass a <CODE>--directory</CODE> argument, which is the path to the folder containing all of your files. Any <CODE>short_in</CODE> files will be found and analysed. The PLQY values will be saved in a <CODE>batch_plqy_results.csv</CODE> file. This works by searching for <CODE>short_in</CODE> files and matching the file names to corresponding <CODE>short_out</CODE>, <CODE>long_in</CODE>, and <CODE>long_out</CODE> files. This means the files must have matching file names, such as: <BR>
 
-  To run the code use (inputting your own arguments as required):
+<CODE>
+  
+path\to\your\folder
+        |
+        |_______ sample1_info_short_in.txt
+        |_______ sample1_info_short_out.txt
+        |_______ sample1_info_long_in.txt
+        |_______ sample1_info_long_out.txt
+        |_______ bckg.txt
+        |_______ empty.txt
+        |_______ long_bckg.txt
+        |_______ long_empty.txt
+        
+</CODE>
+
+The only exceptions to this are that when searching for <CODE>_out</CODE> files, the regex expression <CODE>_spot\d+</CODE> is ignored, so you may use the same <CODE>_out</CODE> file for <CODE>_in</CODE> files at different spots.
+
+<BR> To run the code, use (inputting your own arguments as required):
   
   ```
   uv run batch.py --directory path\to\your\folder --short_time 100 --long_time 5000
