@@ -109,81 +109,105 @@ def process_single_sample(short_in_path: Path, args) -> dict:
 
     if long_in_path.exists():
         logger.info("Found long_in file: %s", long_in_name)
-        long_out_path = work_dir / long_in_name.replace("in.txt", "out.txt")
-        logger.info("Found long_out file: %s", long_out_path)
-        if not long_out_path.exists():
+    else:
+        escaped_name = re.escape(long_in_name)
+        pattern_str = re.sub(r'\d+ms', r'\\d+ms', escaped_name)
+        pattern = re.compile(rf"^{pattern_str}")
+        matches = [
+        file for file in work_dir.iterdir()
+        if file.is_file() and pattern.match(file.name)
+    ]
+        if matches:
+            long_in_path = matches[0]
+            logger.info("Removed integration time from long_in path: %s", long_in_path.name)
+        else:
+            logger.warning("No long file found")
+            raise SampleProcessingError(f"long_in file missing: {long_in_path.name}")
+        
+    long_out_path = work_dir / long_in_path.name.replace("in.txt", "out.txt")
+    if not long_out_path.exists():
             long_out_path = work_dir / re.sub(r"_spot\d+", "", long_in_name).replace("in.txt", "out.txt")
-            logger.info("Using generic long_out file: %s", long_out_path)
+            logger.info("Removed spot reference from long_out path: %s", long_out_path.name)
+            if not long_out_path.exists():
+                escaped_name = re.escape(long_out_path.name)
+                pattern_str = re.sub(r'\d+ms', r'\\d+ms', escaped_name)
+                pattern = re.compile(rf"^{pattern_str}")
+                matches = [
+                file for file in work_dir.iterdir()
+                if file.is_file() and pattern.match(file.name)
+            ]
+                if matches:
+                    long_in_path = matches[0]
+                    logger.info("Removed integration time from long_out path: %s", long_out_path.name)
+                else:
+                    logger.warning("No long file found")
+                    raise SampleProcessingError(f"long_out file missing: {long_out_path.name}")
 
-        if not long_out_path.exists():
-            raise SampleProcessingError(f"long_out file missing: {long_out_path.name}")
 
-        if args.common:
+            
+
+    if args.common:
             long_bckg_path = work_dir / "long_bckg.txt"
             long_empty_path = work_dir / "long_empty.txt"
-        else:
+    else:
             long_bckg_path = work_dir / long_in_name.replace("in.txt", "bckg.txt")
             long_empty_path = work_dir / long_in_name.replace("in.txt", "empty.txt")
 
-        if not long_bckg_path.exists() or not long_empty_path.exists():
-            raise SampleProcessingError("long_bckg / long_empty file missing.")
+    if not long_bckg_path.exists() or not long_empty_path.exists():
+        raise SampleProcessingError("long_bckg / long_empty file missing.")
 
     
-        long_files = {
+    long_files = {
             "long_in": long_in_path,
             "long_bckg": long_bckg_path,
             "long_empty": long_empty_path,
             "long_out": long_out_path,
-        }
-        loaded_long_spectra = {}
+    }
+    loaded_long_spectra = {}
 
-        for file_key, file_path in long_files.items():
-            try:
-                loaded_long_spectra[file_key] = load_spectrum_file(file_path)
-            except (ValueError, IndexError, IOError, TypeError) as e:
-                raise SampleProcessingError(
-                    f"Failed to parse {file_key} file '{file_path.name}': {e}"
-                )
+    for file_key, file_path in long_files.items():
+        try:
+            loaded_long_spectra[file_key] = load_spectrum_file(file_path)
+        except (ValueError, IndexError, IOError, TypeError) as e:
+            raise SampleProcessingError(
+                f"Failed to parse {file_key} file '{file_path.name}': {e}"
+            )
 
-        raw_long_in = loaded_long_spectra["long_in"]
-        raw_long_bckg = loaded_long_spectra["long_bckg"]
-        raw_long_empty = loaded_long_spectra["long_empty"]
-        raw_long_out = loaded_long_spectra["long_out"]
+    raw_long_in = loaded_long_spectra["long_in"]
+    raw_long_bckg = loaded_long_spectra["long_bckg"]
+    raw_long_empty = loaded_long_spectra["long_empty"]
+    raw_long_out = loaded_long_spectra["long_out"]
 
-        (
+    (
             raw_long_in_trimmed,
             raw_long_out_trimmed,
             raw_long_empty_trimmed,
             raw_long_bckg_trimmed,
-        ) = [
+    ) = [
             trim_spectrum(data, args.trim_indices)
             for data in (raw_long_in[:, 1], raw_long_out[:, 1], raw_long_empty[:, 1], raw_long_bckg[:, 1])
-        ]
+    ]
 
-        long_in_proc = scale_baseline_and_time(
+    long_in_proc = scale_baseline_and_time(
             raw_long_in_trimmed - raw_long_bckg_trimmed, wavelengths, args.long_time, args.dark_indices
-        )
-        long_out_proc = scale_baseline_and_time(
+    )
+    long_out_proc = scale_baseline_and_time(
             raw_long_out_trimmed - raw_long_bckg_trimmed, wavelengths, args.long_time, args.dark_indices
-        )
-        long_empty_proc = scale_baseline_and_time(
+    )
+    long_empty_proc = scale_baseline_and_time(
             raw_long_empty_trimmed - raw_long_bckg_trimmed, wavelengths, args.long_time, args.dark_indices
-        )
+    )
 
-        counts_in = combine_short_long_spectra(
+    counts_in = combine_short_long_spectra(
             short_in_proc, long_in_proc, wavelengths, tuple(args.laser_range)
         )
-        counts_out = combine_short_long_spectra(
+    counts_out = combine_short_long_spectra(
             short_out_proc, long_out_proc, wavelengths, tuple(args.laser_range)
         )
-        counts_empty = combine_short_long_spectra(
+    counts_empty = combine_short_long_spectra(
             short_empty_proc, long_empty_proc, wavelengths, tuple(args.laser_range)
         )
-    else:
-        logger.warning("No long exposure file found. Processing short exposure only.")
-        counts_in = short_in_proc
-        counts_out = short_out_proc
-        counts_empty = short_empty_proc
+
 
 
     if args.cal_path and Path(args.cal_path).exists():
